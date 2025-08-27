@@ -1,3 +1,5 @@
+using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.TextCore.Text;
 
@@ -13,9 +15,14 @@ public class PlayerMovement : MonoBehaviour
     Quaternion currentRotation;
 
     [SerializeField]
-    float speed, acceleration, moveSpeed;
+    float speed, acceleration, moveSpeed, jumpForce, jumpTime, gravity;
+
+    [SerializeField]
+    AnimationCurve jumpCurve;
 
     Vector3 forward, right, forwardMovement, rightMovement, initialMovement, currentMovement, inputMovement;
+
+    bool isJumping, canJump;
 
     public float dampening;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -33,16 +40,21 @@ public class PlayerMovement : MonoBehaviour
     void OnEnable()
     {
         input.MoveEvent += OnMove;
+
+        input.JumpEvent += OnJump;
     }
 
     void OnDisable()
     {
         input.MoveEvent -= OnMove;
+
+        input.JumpEvent -= OnJump;
     }
 
     // Update is called once per frame
     void Update()
     {
+        HandleGravity();
         HandleMovement();
     }
 
@@ -62,6 +74,16 @@ public class PlayerMovement : MonoBehaviour
         initialMovement = Vector3.Normalize(rightMovement + forwardMovement);
         currentMovement = Vector3.Lerp(currentMovement, initialMovement, dampening);
         this.inputMovement = inputMovement;
+    }
+
+    void OnJump()
+    {
+        isJumping = true;
+        if (canJump)
+        {
+            canJump = false;
+            StartCoroutine(JumpRoutine());
+        }
     }
 
     void HandleMovement()
@@ -86,21 +108,51 @@ public class PlayerMovement : MonoBehaviour
             speed = moveSpeed;
         }
 
-        // HandleGravity();
-
         if (inputMovement.x == 0 && inputMovement.y == 0)
         {
             currentMovement = lastMovement;
-            characterController.Move(new Vector3(currentMovement.x * speed * Time.deltaTime, currentMovement.y * Time.deltaTime, currentMovement.z * speed * Time.deltaTime));
         }
 
         if (inputMovement.x != 0 || inputMovement.y != 0)
         {
-            characterController.Move(new Vector3(currentMovement.x * speed * Time.deltaTime, currentMovement.y * Time.deltaTime, currentMovement.z * speed * Time.deltaTime));
-
             lastMovement = currentMovement;
         }
 
+        characterController.Move(new Vector3(currentMovement.x * speed * Time.deltaTime, gravity * Time.deltaTime, currentMovement.z * speed * Time.deltaTime));
+
         currentVelocity = characterController.velocity;
+    }
+
+    void HandleGravity()
+    {
+        if (characterController.isGrounded)
+        {
+            canJump = true;
+            gravity = -0.05f;
+        }
+        if (!characterController.isGrounded && !isJumping && currentMovement.y > -10.0f)
+        {
+            gravity -= (10f * Time.deltaTime);
+        }
+
+        characterController.Move(new Vector3(0, gravity * Time.deltaTime, 0));
+    }
+
+    IEnumerator JumpRoutine()
+    {
+        float elapsedTime = 0.0f;
+        float activeForce = jumpForce;
+
+        while (elapsedTime < jumpTime)
+        {
+            characterController.Move(new Vector3(0.0f, jumpCurve.Evaluate(elapsedTime) * activeForce * Time.deltaTime, 0.0f));
+            elapsedTime += Time.deltaTime;
+
+            yield return null;
+        }
+
+        isJumping = false;
+
+        yield return null;
     }
 }

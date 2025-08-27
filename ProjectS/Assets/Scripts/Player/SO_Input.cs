@@ -9,18 +9,27 @@ public class SO_Input : ScriptableObject
     InputActionAsset inputActions;
 
     InputAction moveAction;
+    InputAction jumpAction;
 
     public event UnityAction<Vector2> MoveEvent;
+
+    public event UnityAction JumpEvent;
+    public event UnityAction JumpCanceledEvent;
 
     void OnEnable()
     {
         moveAction = inputActions.FindAction("Move");
+        jumpAction = inputActions.FindAction("Jump");
 
         moveAction.started += OnMoveInput;
         moveAction.performed += OnMoveInput;
         moveAction.canceled += OnMoveInput;
 
+        jumpAction.started += OnJumpInput;
+        jumpAction.canceled += OnJumpInput;
+
         moveAction.Enable();
+        jumpAction.Enable();
     }
 
     void OnDisable()
@@ -29,7 +38,11 @@ public class SO_Input : ScriptableObject
         moveAction.performed -= OnMoveInput;
         moveAction.canceled -= OnMoveInput;
 
+        jumpAction.started -= OnJumpInput;
+        jumpAction.canceled -= OnJumpInput;
+
         moveAction.Disable();
+        jumpAction.Disable();
     }
 
     void OnMoveInput(InputAction.CallbackContext context)
@@ -45,6 +58,18 @@ public class SO_Input : ScriptableObject
         if (MoveEvent != null && context.canceled)
         {
             MoveEvent.Invoke(context.ReadValue<Vector2>());
+        }
+    }
+
+    void OnJumpInput(InputAction.CallbackContext context)
+    {
+        if (JumpEvent != null && context.started)
+        {
+            JumpEvent.Invoke();
+        }
+        if (JumpCanceledEvent != null && context.canceled)
+        {
+            JumpCanceledEvent.Invoke();
         }
     }
 }
