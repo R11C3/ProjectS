@@ -15,7 +15,7 @@ public class PlayerMovement : MonoBehaviour
     Quaternion currentRotation;
 
     [SerializeField]
-    float speed, acceleration, moveSpeed, jumpForce, jumpTime, gravity;
+    float speed, acceleration, moveSpeed, jumpForce, jumpTime, gravity, timeFalling;
 
     [SerializeField]
     AnimationCurve jumpCurve;
@@ -129,10 +129,12 @@ public class PlayerMovement : MonoBehaviour
         {
             canJump = true;
             gravity = -0.05f;
+            timeFalling = 0;
         }
         if (!characterController.isGrounded && !isJumping && currentMovement.y > -10.0f)
         {
-            gravity -= (10f * Time.deltaTime);
+            gravity = -(jumpCurve.Evaluate(1 - timeFalling) * 10.0f);
+            timeFalling += Time.deltaTime;
         }
 
         characterController.Move(new Vector3(0, gravity * Time.deltaTime, 0));
