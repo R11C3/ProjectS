@@ -465,11 +465,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
   input: {fileID: 11400000, guid: e2a4acf440fa27049bae690a7b13d533, type: 2}
+  player: {fileID: 11400000, guid: 6d8ea0c0de432244fa3030d77f44d45d, type: 2}
   speed: 0
-  acceleration: 20
-  moveSpeed: 10
-  jumpForce: 10
-  jumpTime: 0.5
+  gravity: 0
+  timeFalling: 0
   jumpCurve:
     serializedVersion: 2
     m_Curve:

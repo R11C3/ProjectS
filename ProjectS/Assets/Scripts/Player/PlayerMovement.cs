@@ -7,6 +7,8 @@ public class PlayerMovement : MonoBehaviour
 {
     [SerializeField]
     SO_Input input;
+    [SerializeField]
+    SO_Player player;
 
     CharacterController characterController;
     Camera mainCamera;
@@ -15,7 +17,7 @@ public class PlayerMovement : MonoBehaviour
     Quaternion currentRotation;
 
     [SerializeField]
-    float speed, acceleration, moveSpeed, jumpForce, jumpTime, gravity, timeFalling;
+    float speed, gravity, timeFalling;
 
     [SerializeField]
     AnimationCurve jumpCurve;
@@ -88,14 +90,14 @@ public class PlayerMovement : MonoBehaviour
 
     void HandleMovement()
     {
-        if ((inputMovement.x != 0 || inputMovement.y != 0) && speed <= moveSpeed)
+        if ((inputMovement.x != 0 || inputMovement.y != 0) && speed <= player.moveSpeed)
         {
-            speed += acceleration * Time.deltaTime;
+            speed += player.acceleration * Time.deltaTime;
         }
 
         if (inputMovement.x == 0 && inputMovement.y == 0 && speed > 0.0f)
         {
-            speed -= acceleration * Time.deltaTime;
+            speed -= player.acceleration * Time.deltaTime;
         }
 
         if (speed < 0.0f)
@@ -103,9 +105,9 @@ public class PlayerMovement : MonoBehaviour
             speed = 0.0f;
         }
 
-        if (speed > moveSpeed)
+        if (speed > player.moveSpeed)
         {
-            speed = moveSpeed;
+            speed = player.moveSpeed;
         }
 
         if (inputMovement.x == 0 && inputMovement.y == 0)
@@ -133,7 +135,7 @@ public class PlayerMovement : MonoBehaviour
         }
         if (!characterController.isGrounded && !isJumping && currentMovement.y > -10.0f)
         {
-            gravity = -(jumpCurve.Evaluate(1 - timeFalling) * 10.0f);
+            gravity = -(jumpCurve.Evaluate(0.9f - timeFalling) * 10.0f);
             timeFalling += Time.deltaTime;
         }
 
@@ -143,9 +145,9 @@ public class PlayerMovement : MonoBehaviour
     IEnumerator JumpRoutine()
     {
         float elapsedTime = 0.0f;
-        float activeForce = jumpForce;
+        float activeForce = player.jumpForce;
 
-        while (elapsedTime < jumpTime)
+        while (elapsedTime < player.jumpTime)
         {
             characterController.Move(new Vector3(0.0f, jumpCurve.Evaluate(elapsedTime) * activeForce * Time.deltaTime, 0.0f));
             elapsedTime += Time.deltaTime;
