@@ -10,16 +10,21 @@ public class SO_Input : ScriptableObject
 
     InputAction moveAction;
     InputAction jumpAction;
+    InputAction sprintAction;
 
     public event UnityAction<Vector2> MoveEvent;
 
     public event UnityAction JumpEvent;
     public event UnityAction JumpCanceledEvent;
 
+    public event UnityAction SprintEvent;
+    public event UnityAction SprintCanceledEvent;
+
     void OnEnable()
     {
         moveAction = inputActions.FindAction("Move");
         jumpAction = inputActions.FindAction("Jump");
+        sprintAction = inputActions.FindAction("Sprint");
 
         moveAction.started += OnMoveInput;
         moveAction.performed += OnMoveInput;
@@ -28,8 +33,12 @@ public class SO_Input : ScriptableObject
         jumpAction.started += OnJumpInput;
         jumpAction.canceled += OnJumpInput;
 
+        sprintAction.started += OnSprintInput;
+        sprintAction.canceled += OnSprintInput;
+
         moveAction.Enable();
         jumpAction.Enable();
+        sprintAction.Enable();
     }
 
     void OnDisable()
@@ -41,8 +50,12 @@ public class SO_Input : ScriptableObject
         jumpAction.started -= OnJumpInput;
         jumpAction.canceled -= OnJumpInput;
 
+        sprintAction.started -= OnSprintInput;
+        sprintAction.canceled -= OnSprintInput;
+
         moveAction.Disable();
         jumpAction.Disable();
+        sprintAction.Disable();
     }
 
     void OnMoveInput(InputAction.CallbackContext context)
@@ -70,6 +83,18 @@ public class SO_Input : ScriptableObject
         if (JumpCanceledEvent != null && context.canceled)
         {
             JumpCanceledEvent.Invoke();
+        }
+    }
+
+    void OnSprintInput(InputAction.CallbackContext context)
+    {
+        if (SprintEvent != null && context.started)
+        {
+            SprintEvent.Invoke();
+        }
+        if (SprintCanceledEvent != null && context.canceled)
+        {
+            SprintCanceledEvent.Invoke();
         }
     }
 }

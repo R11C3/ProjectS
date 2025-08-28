@@ -17,7 +17,7 @@ public class PlayerMovement : MonoBehaviour
     Quaternion currentRotation;
 
     [SerializeField]
-    float speed, gravity, timeFalling;
+    float speed, newMoveSpeed, newAcceleration, gravity, timeFalling;
 
     [SerializeField]
     AnimationCurve jumpCurve;
@@ -36,21 +36,26 @@ public class PlayerMovement : MonoBehaviour
 
         lastMovement = Vector3.zero;
 
+        newMoveSpeed = player.moveSpeed;
+        newAcceleration = player.acceleration;
+
         CalibrateMovement();
     }
 
     void OnEnable()
     {
         input.MoveEvent += OnMove;
-
         input.JumpEvent += OnJump;
+        input.SprintEvent += OnSprint;
+        input.SprintCanceledEvent += OnSprintCanceled;
     }
 
     void OnDisable()
     {
         input.MoveEvent -= OnMove;
-
         input.JumpEvent -= OnJump;
+        input.SprintEvent -= OnSprint;
+        input.SprintCanceledEvent -= OnSprintCanceled;
     }
 
     // Update is called once per frame
@@ -88,16 +93,28 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    void OnSprint()
+    {
+        newMoveSpeed = player.moveSpeed * 1.75f;
+        newAcceleration = player.acceleration * 3.0f;
+    }
+
+    void OnSprintCanceled()
+    {
+        newMoveSpeed = player.moveSpeed;
+        newAcceleration = player.acceleration;
+    }
+
     void HandleMovement()
     {
-        if ((inputMovement.x != 0 || inputMovement.y != 0) && speed <= player.moveSpeed)
+        if ((inputMovement.x != 0 || inputMovement.y != 0) && speed <= newMoveSpeed)
         {
-            speed += player.acceleration * Time.deltaTime;
+            speed += newAcceleration * Time.deltaTime;
         }
 
         if (inputMovement.x == 0 && inputMovement.y == 0 && speed > 0.0f)
         {
-            speed -= player.acceleration * Time.deltaTime;
+            speed -= newAcceleration * Time.deltaTime;
         }
 
         if (speed < 0.0f)
@@ -105,9 +122,9 @@ public class PlayerMovement : MonoBehaviour
             speed = 0.0f;
         }
 
-        if (speed > player.moveSpeed)
+        if (speed > newMoveSpeed)
         {
-            speed = player.moveSpeed;
+            speed = newMoveSpeed;
         }
 
         if (inputMovement.x == 0 && inputMovement.y == 0)
