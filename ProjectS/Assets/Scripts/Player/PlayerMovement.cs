@@ -26,7 +26,7 @@ public class PlayerMovement : MonoBehaviour
     Vector3 forward, right, forwardMovement, rightMovement, initialMovement, currentMovement, inputMovement;
 
     bool canJump;
-    public bool isJumping;
+    public bool isJumping, crouched;
     public float speed, direction;
 
     public float dampening;
@@ -52,6 +52,8 @@ public class PlayerMovement : MonoBehaviour
         input.JumpEvent += OnJump;
         input.SprintEvent += OnSprint;
         input.SprintCanceledEvent += OnSprintCanceled;
+        input.CrouchEvent += OnCrouch;
+        input.CrouchCanceledEvent += OnCrouchCanceled;
     }
 
     void OnDisable()
@@ -60,6 +62,8 @@ public class PlayerMovement : MonoBehaviour
         input.JumpEvent -= OnJump;
         input.SprintEvent -= OnSprint;
         input.SprintCanceledEvent -= OnSprintCanceled;
+        input.CrouchEvent -= OnCrouch;
+        input.CrouchCanceledEvent -= OnCrouchCanceled;
     }
 
     // Update is called once per frame
@@ -97,13 +101,27 @@ public class PlayerMovement : MonoBehaviour
         if (canJump)
         {
             canJump = false;
-            StartCoroutine(JumpRoutine());
+            // StartCoroutine(JumpRoutine());
         }
+    }
+
+    void OnCrouch()
+    {
+        newMoveSpeed = player.moveSpeed * player.crouchSpeedMultiplier;
+        crouched = true;
+        animator.SetBool("crouched", crouched);
+    }
+
+    void OnCrouchCanceled()
+    {
+        newMoveSpeed = player.moveSpeed;
+        crouched = false;
+        animator.SetBool("crouched", crouched);
     }
 
     void OnSprint()
     {
-        newMoveSpeed = player.moveSpeed * 1.75f;
+        newMoveSpeed = player.moveSpeed * player.sprintSpeedMultiplier;
         newAcceleration = player.acceleration * 3.0f;
     }
 
@@ -179,8 +197,12 @@ public class PlayerMovement : MonoBehaviour
 
     IEnumerator JumpRoutine()
     {
+        Debug.Log("prep");
+        animator.SetBool("jumping", true);
         float elapsedTime = 0.0f;
         float activeForce = player.jumpForce;
+
+        Debug.Log("done");
 
         while (elapsedTime < player.jumpTime)
         {
@@ -191,6 +213,7 @@ public class PlayerMovement : MonoBehaviour
         }
 
         isJumping = false;
+        animator.SetBool("jumping", false);
 
         yield return null;
     }

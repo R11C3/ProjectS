@@ -11,6 +11,7 @@ public class SO_Input : ScriptableObject
     InputAction moveAction;
     InputAction jumpAction;
     InputAction sprintAction;
+    InputAction crouchAction;
 
     public event UnityAction<Vector2> MoveEvent;
 
@@ -20,11 +21,15 @@ public class SO_Input : ScriptableObject
     public event UnityAction SprintEvent;
     public event UnityAction SprintCanceledEvent;
 
+    public event UnityAction CrouchEvent;
+    public event UnityAction CrouchCanceledEvent;
+
     void OnEnable()
     {
         moveAction = inputActions.FindAction("Move");
         jumpAction = inputActions.FindAction("Jump");
         sprintAction = inputActions.FindAction("Sprint");
+        crouchAction = inputActions.FindAction("Crouch");
 
         moveAction.started += OnMoveInput;
         moveAction.performed += OnMoveInput;
@@ -36,9 +41,13 @@ public class SO_Input : ScriptableObject
         sprintAction.started += OnSprintInput;
         sprintAction.canceled += OnSprintInput;
 
+        crouchAction.started += OnCrouchInput;
+        crouchAction.canceled += OnCrouchInput;
+
         moveAction.Enable();
         jumpAction.Enable();
         sprintAction.Enable();
+        crouchAction.Enable();
     }
 
     void OnDisable()
@@ -53,9 +62,13 @@ public class SO_Input : ScriptableObject
         sprintAction.started -= OnSprintInput;
         sprintAction.canceled -= OnSprintInput;
 
+        crouchAction.started -= OnCrouchInput;
+        crouchAction.canceled -= OnCrouchInput;
+
         moveAction.Disable();
         jumpAction.Disable();
         sprintAction.Disable();
+        crouchAction.Disable();
     }
 
     void OnMoveInput(InputAction.CallbackContext context)
@@ -95,6 +108,18 @@ public class SO_Input : ScriptableObject
         if (SprintCanceledEvent != null && context.canceled)
         {
             SprintCanceledEvent.Invoke();
+        }
+    }
+
+    void OnCrouchInput(InputAction.CallbackContext context)
+    {
+        if (CrouchEvent != null && context.started)
+        {
+            CrouchEvent.Invoke();
+        }
+        if (CrouchCanceledEvent != null && context.canceled)
+        {
+            CrouchCanceledEvent.Invoke();
         }
     }
 }
