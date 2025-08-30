@@ -11,26 +11,30 @@ public class PlayerMovement : MonoBehaviour
     SO_Player player;
 
     CharacterController characterController;
+    Animator animator;
     Camera mainCamera;
 
     Vector3 lastMovement, currentVelocity;
     Quaternion currentRotation;
 
     [SerializeField]
-    float speed, newMoveSpeed, newAcceleration, gravity, timeFalling;
+    float newMoveSpeed, newAcceleration, gravity, timeFalling, rotationSpeed;
 
     [SerializeField]
     AnimationCurve jumpCurve;
 
     Vector3 forward, right, forwardMovement, rightMovement, initialMovement, currentMovement, inputMovement;
 
-    bool isJumping, canJump;
+    bool canJump;
+    public bool isJumping;
+    public float speed, direction;
 
     public float dampening;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Awake()
     {
         characterController = GetComponent<CharacterController>();
+        animator = GetComponent<Animator>();
 
         mainCamera = Camera.main;
 
@@ -63,6 +67,10 @@ public class PlayerMovement : MonoBehaviour
     {
         HandleGravity();
         HandleMovement();
+        HandleRotation();
+
+        animator.SetFloat("linearSpeed", speed);
+        
     }
 
     void CalibrateMovement()
@@ -157,6 +165,16 @@ public class PlayerMovement : MonoBehaviour
         }
 
         characterController.Move(new Vector3(0, gravity * Time.deltaTime, 0));
+    }
+
+    void HandleRotation()
+    {
+        if (currentMovement != Vector3.zero)
+        {
+            Quaternion targetRotation = Quaternion.LookRotation(new Vector3(currentMovement.x, 0.0f, currentMovement.z));
+
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+        }
     }
 
     IEnumerator JumpRoutine()
