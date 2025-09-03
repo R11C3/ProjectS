@@ -12,6 +12,7 @@ public class SO_Input : ScriptableObject
     InputAction jumpAction;
     InputAction sprintAction;
     InputAction crouchAction;
+    InputAction attackAction;
 
     public event UnityAction<Vector2> MoveEvent;
 
@@ -24,12 +25,16 @@ public class SO_Input : ScriptableObject
     public event UnityAction CrouchEvent;
     public event UnityAction CrouchCanceledEvent;
 
+    public event UnityAction AttackEvent;
+    public event UnityAction AttackCanceledEvent;
+
     void OnEnable()
     {
         moveAction = inputActions.FindAction("Move");
         jumpAction = inputActions.FindAction("Jump");
         sprintAction = inputActions.FindAction("Sprint");
         crouchAction = inputActions.FindAction("Crouch");
+        attackAction = inputActions.FindAction("Attack");
 
         moveAction.started += OnMoveInput;
         moveAction.performed += OnMoveInput;
@@ -44,10 +49,14 @@ public class SO_Input : ScriptableObject
         crouchAction.started += OnCrouchInput;
         crouchAction.canceled += OnCrouchInput;
 
+        attackAction.started += OnAttackInput;
+        attackAction.canceled += OnAttackInput;
+
         moveAction.Enable();
         jumpAction.Enable();
         sprintAction.Enable();
         crouchAction.Enable();
+        attackAction.Enable();
     }
 
     void OnDisable()
@@ -65,10 +74,14 @@ public class SO_Input : ScriptableObject
         crouchAction.started -= OnCrouchInput;
         crouchAction.canceled -= OnCrouchInput;
 
+        attackAction.started -= OnAttackInput;
+        attackAction.canceled -= OnAttackInput;
+
         moveAction.Disable();
         jumpAction.Disable();
         sprintAction.Disable();
         crouchAction.Disable();
+        attackAction.Disable();
     }
 
     void OnMoveInput(InputAction.CallbackContext context)
@@ -120,6 +133,18 @@ public class SO_Input : ScriptableObject
         if (CrouchCanceledEvent != null && context.canceled)
         {
             CrouchCanceledEvent.Invoke();
+        }
+    }
+
+    void OnAttackInput(InputAction.CallbackContext context)
+    {
+        if (AttackEvent != null && context.started)
+        {
+            AttackEvent.Invoke();
+        }
+        if (AttackCanceledEvent != null && context.canceled)
+        {
+            AttackCanceledEvent.Invoke();
         }
     }
 }
