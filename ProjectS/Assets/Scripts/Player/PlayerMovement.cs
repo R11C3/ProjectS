@@ -71,7 +71,6 @@ public class PlayerMovement : MonoBehaviour
     {
         HandleGravity();
         HandleMovement();
-        HandleRotation();
 
         animator.SetFloat("linearSpeed", speed);
         
@@ -87,7 +86,6 @@ public class PlayerMovement : MonoBehaviour
 
     void OnMove(Vector2 inputMovement)
     {
-        CalibrateMovement();
         rightMovement = right * inputMovement.x;
         forwardMovement = forward * inputMovement.y;
         initialMovement = Vector3.Normalize(rightMovement + forwardMovement);
@@ -166,6 +164,8 @@ public class PlayerMovement : MonoBehaviour
         characterController.Move(new Vector3(currentMovement.x * speed * Time.deltaTime, gravity * Time.deltaTime, currentMovement.z * speed * Time.deltaTime));
 
         currentVelocity = characterController.velocity;
+
+        HandleRotation();
     }
 
     void HandleGravity()
@@ -193,28 +193,5 @@ public class PlayerMovement : MonoBehaviour
 
             transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
         }
-    }
-
-    IEnumerator JumpRoutine()
-    {
-        Debug.Log("prep");
-        animator.SetBool("jumping", true);
-        float elapsedTime = 0.0f;
-        float activeForce = player.jumpForce;
-
-        Debug.Log("done");
-
-        while (elapsedTime < player.jumpTime)
-        {
-            characterController.Move(new Vector3(0.0f, jumpCurve.Evaluate(elapsedTime) * activeForce * Time.deltaTime, 0.0f));
-            elapsedTime += Time.deltaTime;
-
-            yield return null;
-        }
-
-        isJumping = false;
-        animator.SetBool("jumping", false);
-
-        yield return null;
     }
 }

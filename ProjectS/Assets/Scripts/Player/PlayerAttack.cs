@@ -8,15 +8,10 @@ public class PlayerAttack : MonoBehaviour
 
     Animator animator;
 
-    GameObject meleeWeapon;
-    MeshCollider meleeCollider;
-
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         animator = GetComponent<Animator>();
-        meleeCollider = meleeWeapon.GetComponent<MeshCollider>();
-        meleeCollider.enabled = false;
     }
 
     void OnEnable()
