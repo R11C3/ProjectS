@@ -425,6 +425,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 606230357}
+  - component: {fileID: 606230364}
   - component: {fileID: 606230359}
   - component: {fileID: 606230363}
   - component: {fileID: 606230362}
@@ -466,7 +467,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
   input: {fileID: 11400000, guid: e2a4acf440fa27049bae690a7b13d533, type: 2}
-  player: {fileID: 11400000, guid: 6d8ea0c0de432244fa3030d77f44d45d, type: 2}
+  player: {fileID: 0}
   newMoveSpeed: 0
   newAcceleration: 0
   gravity: 0
@@ -573,6 +574,25 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerAttack
   input: {fileID: 11400000, guid: e2a4acf440fa27049bae690a7b13d533, type: 2}
+--- !u!114 &606230364
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 606230356}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0f6302c037b49d243b5a2c45d91b5902, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerStatistics
+  template: {fileID: 11400000, guid: 6d8ea0c0de432244fa3030d77f44d45d, type: 2}
+  moveSpeed: 0
+  acceleration: 0
+  sprintSpeedMultiplier: 0
+  crouchSpeedMultiplier: 0
+  jumpForce: 0
+  jumpTime: 0
 --- !u!4 &678991409 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1571900254084322998, guid: 64b182395c0b6744a920c74bce3ece13, type: 3}

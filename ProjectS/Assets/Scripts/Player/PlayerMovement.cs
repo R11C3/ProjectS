@@ -3,12 +3,13 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.TextCore.Text;
 
+[RequireComponent(typeof(PlayerStatistics))]
 public class PlayerMovement : MonoBehaviour
 {
     [SerializeField]
     SO_Input input;
     [SerializeField]
-    SO_Player player;
+    PlayerStatistics player;
 
     CharacterController characterController;
     Animator animator;
@@ -31,10 +32,11 @@ public class PlayerMovement : MonoBehaviour
 
     public float dampening;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Awake()
+    void Start()
     {
         characterController = GetComponent<CharacterController>();
         animator = GetComponent<Animator>();
+        player = GetComponent<PlayerStatistics>();
 
         mainCamera = Camera.main;
 
@@ -70,10 +72,14 @@ public class PlayerMovement : MonoBehaviour
     void Update()
     {
         HandleGravity();
-        HandleMovement();
+        
+        if (player.canMove)
+        {
+            HandleMovement();
+        }
 
         animator.SetFloat("linearSpeed", speed);
-        
+
     }
 
     void CalibrateMovement()
