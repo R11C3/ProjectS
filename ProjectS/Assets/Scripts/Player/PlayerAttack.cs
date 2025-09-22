@@ -1,3 +1,5 @@
+using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 
 [RequireComponent(typeof(Animator))]
@@ -10,6 +12,11 @@ public class PlayerAttack : MonoBehaviour
 
     GameObject meleeWeapon;
     MeshCollider meleeCollider;
+
+    int variations = 3;
+    int variationCount = 0;
+    bool canAttack = true;
+    bool stillAttacking = false;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -39,11 +46,38 @@ public class PlayerAttack : MonoBehaviour
 
     void OnAttack()
     {
-        animator.SetBool("attacking", true);
+        stillAttacking = true;
+        if (canAttack)
+        {
+            canAttack = false;
+            StartCoroutine(AttackRoutine());
+        }
     }
 
     void OnAttackCanceled()
     {
-        animator.SetBool("attacking", false);
+        stillAttacking = false;
+    }
+
+    IEnumerator AttackRoutine()
+    {
+        string animationName = "Club Attack " + ((variationCount % variations) + 1);
+        animator.Play(animationName);
+
+        yield return new WaitForSeconds(1f);
+
+        if (stillAttacking)
+        {
+            variationCount++;
+            StartCoroutine(AttackRoutine());
+        }
+        else
+        {
+            animator.Play("Club Attack End");
+        }
+
+        canAttack = true;
+
+        yield return null;
     }
 }
