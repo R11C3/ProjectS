@@ -1,6 +1,7 @@
 using System.Collections;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.InputSystem.Controls;
 
 [RequireComponent(typeof(Animator))]
 public class PlayerAttack : MonoBehaviour
@@ -14,7 +15,7 @@ public class PlayerAttack : MonoBehaviour
     MeshCollider meleeCollider;
 
     int variations = 3;
-    int variationCount = 0;
+    int activeVariation = 0;
     bool canAttack = true;
     bool stillAttacking = false;
 
@@ -24,6 +25,7 @@ public class PlayerAttack : MonoBehaviour
         animator = GetComponent<Animator>();
         meleeCollider = meleeWeapon.GetComponent<MeshCollider>();
         meleeCollider.enabled = false;
+        activeVariation = 0;
     }
 
     void OnEnable()
@@ -61,19 +63,39 @@ public class PlayerAttack : MonoBehaviour
 
     IEnumerator AttackRoutine()
     {
-        string animationName = "Club Attack " + ((variationCount % variations) + 1);
+        string animationName = "Club Attack " + ((activeVariation % variations) + 1);
         animator.Play(animationName);
 
-        yield return new WaitForSeconds(1f);
+        float elapsedTime = 0.0f;
+        float animationTime = animator.GetCurrentAnimatorClipInfo(0).Length;
+        bool playNext = false;
 
-        if (stillAttacking)
+        while (elapsedTime < animationTime + 0.05f)
         {
-            variationCount++;
+            if (stillAttacking && elapsedTime >= 0.5f)
+            {
+                playNext = true;
+            }
+
+            elapsedTime += Time.deltaTime;
+
+            if (playNext && animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1.0f)
+            {
+                break;
+            }
+
+            yield return null;
+        }
+
+        if (playNext)
+        {
+            activeVariation++;
             StartCoroutine(AttackRoutine());
         }
         else
         {
             animator.Play("Club Attack End");
+            activeVariation = 0;
         }
 
         canAttack = true;
