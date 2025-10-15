@@ -23,8 +23,8 @@ public class PlayerAttack : MonoBehaviour
     void Start()
     {
         animator = GetComponent<Animator>();
-        meleeCollider = meleeWeapon.GetComponent<MeshCollider>();
-        meleeCollider.enabled = false;
+        // meleeCollider = meleeWeapon.GetComponent<MeshCollider>();
+        // meleeCollider.enabled = false;
         activeVariation = 0;
     }
 
