@@ -1,18 +1,16 @@
 using System.Collections;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem.Controls;
 
 [RequireComponent(typeof(Animator))]
+[RequireComponent(typeof(PlayerStatistics))]
 public class PlayerAttack : MonoBehaviour
 {
     [SerializeField]
     SO_Input input;
 
     Animator animator;
-
-    GameObject meleeWeapon;
-    MeshCollider meleeCollider;
+    PlayerStatistics playerStatistics;
 
     int variations = 3;
     int activeVariation = 0;
@@ -23,9 +21,7 @@ public class PlayerAttack : MonoBehaviour
     void Start()
     {
         animator = GetComponent<Animator>();
-        // meleeCollider = meleeWeapon.GetComponent<MeshCollider>();
-        // meleeCollider.enabled = false;
-        activeVariation = 0;
+        playerStatistics = GetComponent<PlayerStatistics>();
     }
 
     void OnEnable()
@@ -48,12 +44,9 @@ public class PlayerAttack : MonoBehaviour
 
     void OnAttack()
     {
-        stillAttacking = true;
-        if (canAttack)
-        {
-            canAttack = false;
-            StartCoroutine(AttackRoutine());
-        }
+        animator.SetBool("attacking", true);
+        animator.Play("Club Attack One");
+        StartCoroutine(AttackDelay());
     }
 
     void OnAttackCanceled()
@@ -101,5 +94,12 @@ public class PlayerAttack : MonoBehaviour
         canAttack = true;
 
         yield return null;
+    }
+
+    IEnumerator AttackDelay()
+    {
+        playerStatistics.canMove = false;
+        yield return new WaitForSeconds(0.5f);
+        playerStatistics.canMove = true;
     }
 }

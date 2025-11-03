@@ -3,22 +3,23 @@ using UnityEngine;
 
 public class PlayerInteract : MonoBehaviour
 {
-
     [SerializeField]
     SO_Input input;
-    PlayerAim playerAim;
+
+    PlayerAim aim;
+
     Camera mainCamera;
 
     [SerializeField]
-    float interactDistance = 3.0f;
-    [SerializeField]
-    LayerMask mask;
+    LayerMask interactMask;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    [SerializeField]
+    float interactDistance = 3.0f;
+
+    void Awake()
     {
+        aim = GetComponent<PlayerAim>();
         mainCamera = Camera.main;
-        playerAim = GetComponent<PlayerAim>();
     }
 
     void OnEnable()
@@ -29,17 +30,6 @@ public class PlayerInteract : MonoBehaviour
     void OnDisable()
     {
         input.InteractEvent -= OnInteract;
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
-
-    void OnInteract()
-    {
-        Interact();
     }
 
     bool InRange(Vector3 position)
@@ -54,17 +44,22 @@ public class PlayerInteract : MonoBehaviour
         }
     }
 
-    void Interact()
+    void OnInteract()
     {
-        Ray ray = mainCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0.0f));
+        Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
 
-        if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, mask))
+        if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, interactMask))
         {
-            if (InRange(hit.point) && hit.transform.gameObject.CompareTag("Interactable"))
+            if(InRange(hit.point) && hit.transform.gameObject.CompareTag("Interactable"))
             {
-                InteractBase target;
+                Interactable target;
                 GameObject hitObject = hit.transform.gameObject;
-                hitObject.TryGetComponent<InteractBase>(out target);
+                hitObject.TryGetComponent<Interactable>(out target);
+                while (target == null && hitObject != null)
+                {
+                    hitObject = hitObject.transform.parent.gameObject;
+                    hitObject.TryGetComponent<Interactable>(out target);
+                }
                 target.Interact(gameObject);
             }
         }

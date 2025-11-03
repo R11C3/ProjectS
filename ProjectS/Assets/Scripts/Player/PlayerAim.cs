@@ -1,45 +1,36 @@
+using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using UnityEngine.Rendering;
 
 public class PlayerAim : MonoBehaviour
 {
-
-    [SerializeField] public LayerMask mask;
-    [SerializeField] private bool renderLine;
-
-    private Transform characterTransform;
-    private Camera mainCamera;
     [SerializeField]
-    private SO_Player player;
+    LayerMask mask;
+
+    [SerializeField]
+    LayerMask floor;
+
+    Camera mainCamera;
     public Vector3 mousePosition;
 
     void Awake()
     {
         mainCamera = Camera.main;
-        characterTransform = GetComponent<Transform>();
     }
 
-    // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
-
+        GetMousePosition();
     }
 
-    public Vector3 GetInteractPosition()
+    public void GetMousePosition()
     {
+        Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
 
-        Ray ray = mainCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0.0f));
-
-        if (Physics.Raycast(ray, out RaycastHit hitInfo, Mathf.Infinity, mask))
+        if (Physics.Raycast(ray, out RaycastHit hitInfo, Mathf.Infinity, floor))
         {
-            return hitInfo.point;
-        }
-        else
-        {
-            return Vector3.zero;
+            mousePosition = hitInfo.point;
         }
     }
 }
